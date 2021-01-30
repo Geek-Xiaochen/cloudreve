@@ -1,6 +1,7 @@
 # cloudreve
 
 一键下载&启动Linux上的Cloudreve，设为开机自启等功能<br>
+一键跳转下载Aria2安装脚本
 <br>
 一键启动命令：<br>
 CentOS: yum install wget <br>
