@@ -1,24 +1,27 @@
 #!/bin/bash
 
 cp $(pwd)/cloudreve.sh /usr/bin
-mv /usr/bin/cloudreve.sh /usr/bin/cloudreve
+mv /usr/bin/cloudreve.sh /usr/bin/cloudreved
+chmod +x /usr/bin/cloudreved
 
 echo "========================="
 echo -e "\033[32m 感谢使用Cloudreve自助脚本 \033[0m"
 echo -e "\033[32m Author：筱晨~ \033[0m"
 echo -e "\033[32m Home：www.svip13.cn\033[0m"
-echo -e "\033[32m Version：1.0 \033[0m"
+echo -e "\033[32m Version：1.1 \033[0m"
 echo -e "\033[32m Github: https://github.com/Geek-Xiaochen/mc_start \033[0m"
 echo "========================="
 printf "\n"
-echo -e "\033[33m 终端输入 cloudreve 调用此脚本\033[0m"
+echo -e "\033[33m 终端输入 cloudreved 调用此脚本\033[0m"
 echo -e "\033[32m 1.\033[0m 下载并运行Cloudreve"
 echo -e "\033[32m 2.\033[0m 仅运行Cloudreve"
-echo -e "\033[32m 3.\033[0m 设置Cloudreve开机启动"
-echo -e "\033[32m 4.\033[0m 更新脚本到最新"
-echo -e "\033[32m 5.\033[0m 移除本机所有Cloudreve(谨慎操作)"
-echo -e "\033[32m 6.\033[0m 切换到Aria2一键安装管理脚本"
-echo -e "\033[32m 7.\033[0m 退出脚本"
+echo -e "\033[32m 3.\033[0m Nohup后台运行Cloudreve"
+echo -e "\033[32m 4.\033[0m Screen后台运行Cloudreve"
+echo -e "\033[32m 5.\033[0m 设置Cloudreve开机启动"
+echo -e "\033[32m 6.\033[0m 更新脚本到最新"
+echo -e "\033[32m 7.\033[0m 移除本机所有Cloudreve(谨慎操作)"
+echo -e "\033[32m 8.\033[0m 切换到Aria2一键安装管理脚本"
+echo -e "\033[32m 9.\033[0m 退出脚本"
 
 mkdir /usr/local/bin/cloud/ > /dev/null 2>&1
 
@@ -84,36 +87,60 @@ case $num in
 
     ;;
     "2")
-
+    
 	$source
-	
+	echo -e "\033[32m 启动成功！ \033[0m"
 	;;
-    "3")
+	"3")
+	cd $route
+	log=$(date "+%Y%m%d_logs")
+	mkdir "$route"cloudlogs/
+	touch "$route"cloudlogs/$log
+	nohup $source >"$route"cloudlogs/$log 2>&1 &
+	echo -e "\033[32m 启动成功！ \033[0m"
+	echo -e "\033[32m 请手动检查运行状态！ \033[0m"
+	;;
+	"4")
+	apt update -y > /dev/null 2>&1
+	
+	apt install screen -y > /dev/null 2>&1
+	yum install screen -y > /dev/null 2>&1
+	cd $route
+	log=$(date "+%Y%m%d_logs")
+	mkdir "$route"cloudlogs/ > /dev/null 2>&1
+	touch "$route"cloudlogs/$log
+	
+	screen_name=$"cloud_xiaochen"
+	screen -dmS $screen_name
+	cloudstart="$source"
+	screen -x -S $screen_name -p 0 -X stuff "$cloudstart"
+	screen -x -S $screen_name -p 0 -X stuff "\n"
+	
+	echo -e "\033[32m 开启成功！ \033[0m"
+	echo -e "\033[32m 终端输入screen -r cloud_xiaochen查看状态 \033[0m"
 
-		echo "
-[Unit]
-Description=筱晨Cloudreve开机自启动
+	;;
+    "5")
+	$(echo "[Unit]
+Description=Cloudreve
 After=sshd.service
 [Service]
-WorkingDirectory=$route
-Type=forking
 ExecStart=$source
 [Install]
-WantedBy=multi-user.target
-" > /etc/systemd/system/cloudreve.service
+WantedBy=multi-user.target" > /etc/systemd/system/cloudreve.service ) 
 
 		sudo systemctl daemon-reload > /dev/null 2>&1
 		sudo systemctl enable cloudreve.service > /dev/null 2>&1
 		echo -e "\033[32m 设置开机自启动成功 \033[0m"
 
     ;;
-    "4")
-    rm $(pwd)/mc.sh
+    "6")
+    rm $(pwd)/cloudreve.sh
     wget https://www.svip13.cn/sh/cloudreve/cloudreve.sh > /dev/null 2>&1 && chmod +x cloudreve.sh
     echo -e "\033[31m 已更新至最新版本！ \033[0m"
     bash cloudreve.sh
     ;;
-    "5")
+    "7")
 	echo -e "\033[31m 误删文件与作者无关 \033[0m"
 	read -n1 -p "任意键继续 "
 	rm -ivr $route
@@ -121,7 +148,7 @@ WantedBy=multi-user.target
      echo -e "\033[31m 已删除源文件 \033[0m"
      echo -e "\033[31m 请自行删除存储路径 \033[0m"
 	;;
-    "6")
+    "8")
 
 	apt install curl ca-certificates -y > /dev/null 2>&1
 	yum install curl ca-certificates -y > /dev/null 2>&1
@@ -129,7 +156,7 @@ WantedBy=multi-user.target
 	./aria2.sh
 	
     ;;
-    "7")
+    "9")
 
     	echo -e "\033[32m 反馈建议请致件：hbsyzxc@aliyun.com \033[0m"
 	echo -e "\033[32m 已退出此脚本 \033[0m"
